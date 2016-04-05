@@ -31,7 +31,8 @@ public class DataDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         //This string is the meat of this whole class. It's in a very specific format because
         //SQL just takes a string statement to create the database and all its tables. If you die in
-        //this string, you die in real life. The three rows here (_ID, COLUMN_WORD and COLUMN_MEANING)
+        //this string, you die in real life, so make sure you get it right.
+        //The three rows here (_ID, COLUMN_WORD and COLUMN_MEANING)
         //are split up onto separate lines so it's easier to read. You need the _ID line as this is
         //a unique identifier in the database for that row. The other two columns have their names
         //defined and what type of data they hold. 'Not null' means that there must be some data for
@@ -39,7 +40,7 @@ public class DataDbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_DATA_TABLE = "CREATE TABLE " + Data.TABLE_NAME + " (" +
                 Data._ID + " INTEGER PRIMARY KEY," +  //Could have autoincrement here, but there is no order to the data, so it's ok to reuse IDs
                 Data.COLUMN_WORD + " TEXT NOT NULL, " +
-                Data.COLUMN_MEANING + " TEXT NOT NULL, " + " );";
+                Data.COLUMN_MEANING + " TEXT NOT NULL" + " );";
 
         //This statement just takes the above string and feeds it into the database to create the table
         db.execSQL(SQL_CREATE_DATA_TABLE);

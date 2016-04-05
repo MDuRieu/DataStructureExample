@@ -1,5 +1,6 @@
 package com.example.the_crab.dataexample.data;
 
+import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -32,10 +33,11 @@ public class DataContract {
 
         //Single strings for the data
         public static final String COLUMN_WORD = "word";
-        public static final String COLUMN_MEANING =  "meaning";
+        public static final String COLUMN_MEANING = "meaning";
 
-
-       // public static Uri buildDataUri(long id){
-       //     return ContentUris.withAppendedId(CONTENT_URI, id);
+        //This is called by the Provider insert method
+        public static Uri buildDataUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+    }
 }

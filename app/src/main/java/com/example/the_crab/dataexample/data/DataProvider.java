@@ -3,6 +3,7 @@ package com.example.the_crab.dataexample.data;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
@@ -31,16 +32,33 @@ import android.support.annotation.Nullable;
  *
  */
 public class DataProvider extends ContentProvider{
+
+    private DataDbHelper mOpenHelper;
+
     @Override
     public boolean onCreate() {
-        return false;
+        //Initialise instance variable
+        mOpenHelper = new DataDbHelper(getContext());
+        return true; //Return true to tell Android that the content provider was created successfully
     }
 
     @Nullable
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return null;
+        Cursor retCursor;
+        retCursor = mOpenHelper.getReadableDatabase().query(
+                DataContract.Data.TABLE_NAME,
+                null,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+        return retCursor;
     }
+
 
     @Nullable
     @Override
@@ -51,7 +69,14 @@ public class DataProvider extends ContentProvider{
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        return null;
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        Uri returnUri;
+        long _id = db.insert(DataContract.Data.TABLE_NAME, null, values);
+        returnUri = DataContract.Data.buildDataUri(_id);
+
+
+        getContext().getContentResolver().notifyChange(uri, null); //Notifies any registered observers of changes
+        return returnUri;
     }
 
     @Override
