@@ -33,6 +33,7 @@ import android.support.annotation.Nullable;
  */
 public class DataProvider extends ContentProvider{
 
+    //Declare an instance of the database helper for use by methods in this class
     private DataDbHelper mOpenHelper;
 
     @Override
@@ -45,7 +46,12 @@ public class DataProvider extends ContentProvider{
     @Nullable
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        //Declare the cursor to be returned by the query method
         Cursor retCursor;
+        //This statement queries the database using the parameters input from when the content provider
+        //was called. You can use a switch statement based on the URI passed to determine which arguments
+        //you want to actually pass. This stops rogue developers from making calls on your database that
+        //weren't intended.
         retCursor = mOpenHelper.getReadableDatabase().query(
                 DataContract.Data.TABLE_NAME,
                 null,
@@ -55,7 +61,6 @@ public class DataProvider extends ContentProvider{
                 null,
                 sortOrder
         );
-        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
     }
 
@@ -69,10 +74,12 @@ public class DataProvider extends ContentProvider{
     @Nullable
     @Override
     public Uri insert(Uri uri, ContentValues values) {
+        //Get an instance of the database to write to
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        Uri returnUri;
+
         long _id = db.insert(DataContract.Data.TABLE_NAME, null, values);
-        returnUri = DataContract.Data.buildDataUri(_id);
+
+        Uri returnUri = DataContract.Data.buildDataUri(_id);
 
 
         getContext().getContentResolver().notifyChange(uri, null); //Notifies any registered observers of changes

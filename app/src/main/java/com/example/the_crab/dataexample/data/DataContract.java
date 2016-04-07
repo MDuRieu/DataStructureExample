@@ -7,6 +7,12 @@ import android.provider.BaseColumns;
 
 /**
  * Created by the_crab on 5/04/16.
+ *
+ * This class contains a bunch of constants which are referred to by various parts of the
+ * data management structure. It groups them all together so that various classes can access
+ * the constants from one place. Depending on the requirements of your database, you may need
+ * more than is in this simple example.
+ *
  */
 public class DataContract {
 
@@ -21,13 +27,6 @@ public class DataContract {
     public static final class Data implements BaseColumns {
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_DATA).build();
-
-        public static final String CONTENT_TYPE = "vnd.android.cursor.dir/" + CONTENT_AUTHORITY + "/" + PATH_DATA;
-
-        //  public static final String CONTENT_TYPE =
-        //           ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
-        //  public static final String CONTENT_ITEM_TYPE =
-        //           ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
 
         public static final String TABLE_NAME = "data";
 
