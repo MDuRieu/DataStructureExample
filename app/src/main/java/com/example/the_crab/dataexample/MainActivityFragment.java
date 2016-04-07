@@ -21,17 +21,24 @@ import java.util.List;
 
 
 public class MainActivityFragment extends Fragment {
-    //Cursor to hold results from database.
-    Cursor cursor;
+
+    //Temporary list while RecyclerView is developed
     private List<DummyData> dataList = new ArrayList<>();
+
+    //Instance of the DataAdapter, is bound to the RecyclerView
     private DataAdapter mAdapter;
+
+    //The RecyclerView, instantiated here to have several methods called on it later
     private RecyclerView recyclerView;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Adapter is instantiated and passed the dataList in this case since the Loader
+        //isn't implemented
         mAdapter = new DataAdapter(dataList);
+        //Scrap this method once Loader implemented
         populateData();
 
     }

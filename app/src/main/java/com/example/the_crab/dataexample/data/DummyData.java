@@ -2,6 +2,8 @@ package com.example.the_crab.dataexample.data;
 
 /**
  * Created by the_crab on 7/04/16.
+ *
+ * Temporary class to test the RecyclerView before updating it to use a Loader and the DB
  */
 public class DummyData {
     private String word, meaning;
