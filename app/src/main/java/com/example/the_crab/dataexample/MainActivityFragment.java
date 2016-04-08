@@ -1,10 +1,15 @@
 package com.example.the_crab.dataexample;
 
+//import android.app.LoaderManager;
+
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,32 +19,31 @@ import android.view.ViewGroup;
 
 import com.example.the_crab.dataexample.data.DataAdapter;
 import com.example.the_crab.dataexample.data.DataContract;
-import com.example.the_crab.dataexample.data.DummyData;
 
-import java.util.ArrayList;
-import java.util.List;
+//import android.content.CursorLoader;
+//import android.content.Loader;
 
 
-public class MainActivityFragment extends Fragment {
-
-    //Temporary list while RecyclerView is developed
-    private List<DummyData> dataList = new ArrayList<>();
+public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     //Instance of the DataAdapter, is bound to the RecyclerView
-    private DataAdapter mAdapter;
+    private DataAdapter adapter;
 
     //The RecyclerView, instantiated here to have several methods called on it later
     private RecyclerView recyclerView;
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(0, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //Adapter is instantiated and passed the dataList in this case since the Loader
-        //isn't implemented
-        mAdapter = new DataAdapter(dataList);
-        //Scrap this method once Loader implemented
-        populateData();
+        //Adapter is instantiated
+        adapter = new DataAdapter();
+
 
     }
     public MainActivityFragment() {
@@ -55,38 +59,49 @@ public class MainActivityFragment extends Fragment {
 
         if (!cursor.moveToFirst()) {
             ContentValues values = new ContentValues();
-            values.put(DataContract.Data.COLUMN_WORD, "Aschgieger");
-            values.put(DataContract.Data.COLUMN_MEANING, "Ass Violin");
+            values.put(DataContract.Data.COLUMN_WORD, "Treppenwitz");
+            values.put(DataContract.Data.COLUMN_MEANING, "The things you should have said but only occur to you when it is too late, such as all the witty one-liners you only think of after you have left the party.");
             Uri insertUri = getContext().getContentResolver().insert(DataContract.Data.CONTENT_URI, values);
-            System.out.println(DataContract.Data.CONTENT_URI.toString());
-            //  System.out.println(insertUri.toString());
+            values.put(DataContract.Data.COLUMN_WORD, "Torschlusspanik");
+            values.put(DataContract.Data.COLUMN_MEANING, "The fear, usually as one gets older, that time is running out and important opportunities are slipping away");
+            insertUri = getContext().getContentResolver().insert(DataContract.Data.CONTENT_URI, values);
+            values.put(DataContract.Data.COLUMN_WORD, "Backpfeifengesicht");
+            values.put(DataContract.Data.COLUMN_MEANING, "A face that cries out for a fist in it");
+            insertUri = getContext().getContentResolver().insert(DataContract.Data.CONTENT_URI, values);
+            values.put(DataContract.Data.COLUMN_WORD, "Erklärungsnot");
+            values.put(DataContract.Data.COLUMN_MEANING, "The state of requiring a credible explanation at very short notice, such as being discovered by your spouse in the company of an attractive young acquaintance, having claimed to be working late.");
+             insertUri = getContext().getContentResolver().insert(DataContract.Data.CONTENT_URI, values);
+
         }
-        cursor = getContext().getContentResolver().query(DataContract.Data.CONTENT_URI, null, null, null, null);
+        Cursor tempCursor = getContext().getContentResolver().query(DataContract.Data.CONTENT_URI, null, null, null, null);
 
-       while(cursor.moveToNext()) {
-           System.out.println("Cursor result:" + cursor.getString(cursor.getColumnIndex("word")));
-           System.out.println("Cursor result:" + cursor.getString(cursor.getColumnIndex("meaning")));
-       }
+        while (tempCursor.moveToNext()) {
+            System.out.println("Cursor result:" + tempCursor.getString(cursor.getColumnIndex("word")));
+            System.out.println("Cursor result:" + tempCursor.getString(cursor.getColumnIndex("meaning")));
+        }
+            recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+            RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
+            recyclerView.setLayoutManager(mLayoutManager);
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setAdapter(adapter);
 
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity().getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
+            return rootView;
+        }
 
-        return rootView;
+
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(getActivity(),(DataContract.Data.CONTENT_URI), null, null, null, null);
     }
 
-    public void populateData(){
-        DummyData data = new DummyData("Treppenwitz", "The things you should have said but only occur to you when it is too late, such as all the witty one-liners you only think of after you have left the party.");
-        dataList.add(data);
-        data = new DummyData("Torschlusspanik", "The fear, usually as one gets older, that time is running out and important opportunities are slipping away");
-        dataList.add(data);
-        data = new DummyData("Backpfeifengesicht", "A face that cries out for a fist in it");
-        dataList.add(data);
-        data = new DummyData("Erklärungsnot", "The state of requiring a credible explanation at very short notice, such as being discovered by your spouse in the company of an attractive young acquaintance, having claimed to be working late.");
-        dataList.add(data);
-        mAdapter.notifyDataSetChanged();
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        adapter.swapCursor(data);
+    }
 
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+    adapter.swapCursor(null);
     }
 }

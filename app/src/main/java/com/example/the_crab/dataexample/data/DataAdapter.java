@@ -1,5 +1,6 @@
 package com.example.the_crab.dataexample.data;
 
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,8 +8,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.the_crab.dataexample.R;
-
-import java.util.List;
 
 /**
  * Created by the_crab on 6/04/16.
@@ -20,7 +19,8 @@ import java.util.List;
  */
 public class DataAdapter extends RecyclerView.Adapter<DataAdapter.MyViewHolder> {
 
-    private List<DummyData> dataList;
+    private Cursor cursor;
+
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public TextView word, meaning;
@@ -32,8 +32,9 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.MyViewHolder> 
         }
     }
 
-    public DataAdapter(List<DummyData> dataList) {
-        this.dataList = dataList;
+
+    public DataAdapter() {
+
     }
 
 
@@ -50,9 +51,9 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.MyViewHolder> 
     //This is the method called for each instance of the RecyclerView. It describes
     //which data should be set to the views in the RecyclerView layout.
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        DummyData dummyData = dataList.get(position);
-        holder.word.setText(dummyData.getWord());
-        holder.meaning.setText(dummyData.getMeaning());
+        cursor.moveToPosition(position);
+        holder.word.setText(cursor.getString(cursor.getColumnIndex("word")));
+        holder.meaning.setText(cursor.getString(cursor.getColumnIndex("meaning")));
     }
 
     @Override
@@ -60,6 +61,19 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.MyViewHolder> 
         //This method determines how many times the recyclerview will be recycled
         //eg if you set this to two and give it a data set with 10 items, only 2 recyclerviews
         //will be made
-        return dataList.size();
+        if (cursor == null){
+            return 0;
+        }
+        return cursor.getCount();
     }
+
+    public void swapCursor(Cursor newCursor) {
+        cursor = newCursor;
+        notifyDataSetChanged();
+    }
+
+    public Cursor getCursor() {
+        return cursor;
+    }
+
 }
