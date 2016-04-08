@@ -2,6 +2,7 @@ package com.example.the_crab.dataexample.data;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -36,8 +37,15 @@ public class DataProvider extends ContentProvider{
     //Declare an instance of the database helper for use by methods in this class
     private DataDbHelper mOpenHelper;
 
+    static final int DATA = 100;
+
+    //The URI Matcher used by this provider
+    private static final UriMatcher sUriMatcher = buildUriMatcher();
+
     @Override
     public boolean onCreate() {
+
+
         //Initialise instance variable
         mOpenHelper = new DataDbHelper(getContext());
         return true; //Return true to tell Android that the content provider was created successfully
@@ -52,23 +60,45 @@ public class DataProvider extends ContentProvider{
         //was called. You can use a switch statement based on the URI passed to determine which arguments
         //you want to actually pass. This stops rogue developers from making calls on your database that
         //weren't intended.
-        retCursor = mOpenHelper.getReadableDatabase().query(
-                DataContract.Data.TABLE_NAME,
-                null,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                sortOrder
-        );
+        switch (sUriMatcher.match(uri)) {
+            case DATA:{
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        DataContract.Data.TABLE_NAME,
+                        null,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Unknown URI: " + uri);
+
+
+        }
+        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
     }
 
 
     @Nullable
     @Override
+    //Not necessary for this example app but good to have an idea how it works
     public String getType(Uri uri) {
-        return null;
+        final int match = sUriMatcher.match(uri);
+
+        switch (match){
+            case DATA:
+                //This returns the content type because it returns multiple items
+                //(what happens when there's only one DB entry?)
+                return DataContract.Data.CONTENT_TYPE;
+
+            default:
+                throw new UnsupportedOperationException("Unknown Uri: " + uri);
+
+        }
+
     }
 
     @Nullable
@@ -95,4 +125,14 @@ public class DataProvider extends ContentProvider{
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         return 0;
     }
+
+    static UriMatcher buildUriMatcher(){
+        final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
+        final String authority = DataContract.CONTENT_AUTHORITY;
+
+        matcher.addURI(authority, DataContract.PATH_DATA, DATA);
+
+        return matcher;
+    }
+
 }

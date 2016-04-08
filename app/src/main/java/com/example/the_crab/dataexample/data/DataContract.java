@@ -1,5 +1,6 @@
 package com.example.the_crab.dataexample.data;
 
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -24,9 +25,22 @@ public class DataContract {
 
     public static final String PATH_DATA = "data";
 
+
+
+
+
     public static final class Data implements BaseColumns {
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_DATA).build();
+
+        //These item types convey whether the content URI will be returning a cursor containing
+        //a single record (type Item) or multiple records (type Directory). Content providers can
+        //also return data other than database cursors (such as images)
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_DATA;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_DATA;
+
 
         public static final String TABLE_NAME = "data";
 

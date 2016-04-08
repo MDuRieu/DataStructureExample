@@ -20,8 +20,6 @@ import android.view.ViewGroup;
 import com.example.the_crab.dataexample.data.DataAdapter;
 import com.example.the_crab.dataexample.data.DataContract;
 
-//import android.content.CursorLoader;
-//import android.content.Loader;
 
 
 public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
