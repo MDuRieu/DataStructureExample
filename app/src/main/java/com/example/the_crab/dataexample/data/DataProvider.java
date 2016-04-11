@@ -10,29 +10,28 @@ import android.support.annotation.Nullable;
 
 /**
  * Created by the_crab on 5/04/16.
- *
+ * <p>
  * If you start with a blank class and extend ContentProvider, Android Studio will prompt you to
  * implement the required methods OnCreate, query, getType, insert, delete, update. These are the
  * common methods you can do to your database. Each one takes an address (URI) and some arguments
  * of one form or another.
- *
+ * <p>
  * ********************************************
  * THE MOST CONFUSING THING ABOUT DATABASES IN ANDROID IS that you have to register this
  * content provider in the manifest!!! If you don't, you will lose your mind trying to figure out
  * what's wrong. Also, you NEVER INSTANTIATE OR CALL THIS CLASS DIRECTLY.
- *
+ * <p>
  * You get cursor objects in your other classes (Like MainActivityFragment in this app) by calling
  * things like  Cursor cursor  = getContext().getContentResolver().query(URI and arguments in here)
- *
+ * <p>
  * The content resolver knows where to go because we told it that this content provider exists in
  * the manifest! This goes inside the application tag
- *   <provider
- *   android:authorities="com.example.the_crab.dataexample"
- *   android:name=".data.DataProvider" />
+ * <provider
+ * android:authorities="com.example.the_crab.dataexample"
+ * android:name=".data.DataProvider" />
  * ********************************************
- *
  */
-public class DataProvider extends ContentProvider{
+public class DataProvider extends ContentProvider {
 
     //Declare an instance of the database helper for use by methods in this class
     private DataDbHelper mOpenHelper;
@@ -44,8 +43,6 @@ public class DataProvider extends ContentProvider{
 
     @Override
     public boolean onCreate() {
-
-
         //Initialise instance variable
         mOpenHelper = new DataDbHelper(getContext());
         return true; //Return true to tell Android that the content provider was created successfully
@@ -61,7 +58,9 @@ public class DataProvider extends ContentProvider{
         //you want to actually pass. This stops rogue developers from making calls on your database that
         //weren't intended.
         switch (sUriMatcher.match(uri)) {
-            case DATA:{
+            case DATA: {
+                //These cases allow you to use the arguments that you want, regardless of what is sent
+                //in the query.
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         DataContract.Data.TABLE_NAME,
                         null,
@@ -74,8 +73,6 @@ public class DataProvider extends ContentProvider{
             }
             default:
                 throw new UnsupportedOperationException("Unknown URI: " + uri);
-
-
         }
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
@@ -88,7 +85,7 @@ public class DataProvider extends ContentProvider{
     public String getType(Uri uri) {
         final int match = sUriMatcher.match(uri);
 
-        switch (match){
+        switch (match) {
             case DATA:
                 //This returns the content type because it returns multiple items
                 //(what happens when there's only one DB entry?)
@@ -96,9 +93,7 @@ public class DataProvider extends ContentProvider{
 
             default:
                 throw new UnsupportedOperationException("Unknown Uri: " + uri);
-
         }
-
     }
 
     @Nullable
@@ -106,12 +101,19 @@ public class DataProvider extends ContentProvider{
     public Uri insert(Uri uri, ContentValues values) {
         //Get an instance of the database to write to
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+        Uri returnUri;
 
-        long _id = db.insert(DataContract.Data.TABLE_NAME, null, values);
+        switch (match) {
+            case DATA: {
+                long _id = db.insert(DataContract.Data.TABLE_NAME, null, values);
+                returnUri = DataContract.Data.buildDataUri(_id);
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
 
-        Uri returnUri = DataContract.Data.buildDataUri(_id);
-
-
+        }
         getContext().getContentResolver().notifyChange(uri, null); //Notifies any registered observers of changes
         return returnUri;
     }
@@ -126,7 +128,7 @@ public class DataProvider extends ContentProvider{
         return 0;
     }
 
-    static UriMatcher buildUriMatcher(){
+    static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = DataContract.CONTENT_AUTHORITY;
 
